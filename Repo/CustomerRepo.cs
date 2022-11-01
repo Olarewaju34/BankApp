@@ -6,24 +6,24 @@ namespace BankApp.Repo
 {
     public class CustomerRepo : ICustomerRepo
     {
-        
+
         public static List<Customer> Customers;
         public CustomerRepo()
         {
             Customers = new List<Customer>();
-             ReadFromFile();
+            ReadFromFile();
         }
 
-        public Customer GetCustomer(string password)
+        public Customer GetCustomer(string email, string password)
         {
-            return Customers.Find(i => i.Password == password);
+            return Customers.Find(i => i.Email == email && i.Password == password);
         }
 
         public List<Customer> GetAll()
         {
             return Customers;
         }
-     
+
 
         public void WriteToFile(Customer customer)
         {
@@ -59,7 +59,7 @@ namespace BankApp.Repo
             }
         }
 
-     
+
 
         private void ReadFromFile()
         {
@@ -77,7 +77,7 @@ namespace BankApp.Repo
                 }
                 else
                 {
-                   
+
                     using (File.Create(Constants.Constants.fullPath))
                     {
                     }
@@ -89,6 +89,6 @@ namespace BankApp.Repo
             }
         }
 
-       
+
     }
 }

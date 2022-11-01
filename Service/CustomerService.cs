@@ -9,10 +9,12 @@ namespace BankApp.Service
     {
         public static TransactionRepo transactionRepos;
         public static CustomerRepo customerRepo;
+        public static Transaction transaction;
         public CustomerService()
         {
             transactionRepos = new TransactionRepo();
             customerRepo = new CustomerRepo();
+            transaction = new Transaction();
         }
 
         public bool AccountNumExist(string accountnum)
@@ -50,6 +52,7 @@ namespace BankApp.Service
             }
             Console.Write("Enter your password: ");
             string password = Console.ReadLine();
+            
             Console.Write("Enter your 4 unique pin: ");
             string pin = Console.ReadLine();
             while (pin.Length < 4 || pin.Length > 4)
@@ -59,7 +62,7 @@ namespace BankApp.Service
             }
             string accountnum = Helper.CreateAccNum();
             Console.WriteLine("Enter Amount u want to deposit: ");
-            decimal amount= Convert.ToDecimal(Console.ReadLine());
+            decimal amount = Convert.ToDecimal(Console.ReadLine());
             while (amount < 1000)
             {
                 Console.WriteLine("You cannot deposit less than  a thousand");
@@ -79,19 +82,23 @@ namespace BankApp.Service
                 AccountBalance = amount,
                 Date = dob,
             };
-            var findcustomer = customerRepo.GetCustomer(password);
+            var findcustomer = customerRepo.GetCustomer(request.Email,password);
             if (findcustomer == null)
             {
                 customers.Add(customer);
                 customerRepo.WriteToFile(customer);
                 Console.WriteLine("You have created an account with " + accountnum);
             }
+            else
+            {
+                Console.WriteLine("Email already exist!!!!");
+            }
 
         }
 
-        public Customer Login(string password)
+        public Customer Login(string email,string password)
         {
-            var customer = customerRepo.GetCustomer(password);
+            var customer = customerRepo.GetCustomer(email,password);
             if (customer != null)
             {
                 return customer;
@@ -106,14 +113,21 @@ namespace BankApp.Service
             decimal amount = Convert.ToDecimal(Console.ReadLine());
             Console.WriteLine("Enter your accountnumber: ");
             string accountnum = Console.ReadLine();
-            DateTime  date = DateTime.Now;
+            DateTime date = DateTime.Now;
             var transaction = new Transaction
             {
-               Amount = amount,
-               Date = date
+                Amount = amount,
+                Date = date
             };
             if (AccountNumExist(accountnum))
             {
+                Console.WriteLine("Enter your pin: ");
+                string pin = Console.ReadLine();
+                while (request.Pin != pin)
+                {
+                    Console.WriteLine("Invalid pin!!!");
+                    pin = Console.ReadLine();
+                }
                 request.AccountBalance += amount;
                 transactions.Add(transaction);
                 customerRepo.RefreshFile();
@@ -126,9 +140,39 @@ namespace BankApp.Service
             }
         }
 
-        public void MakeWithdrawal(Transaction money)
+        public void MakeWithdrawal(Customer customer)
         {
-            throw new NotImplementedException();
+            decimal Totalamount = 0;
+            Console.WriteLine("Enter your account number: ");
+            string accountnum = Console.ReadLine();
+
+            while (AccountNumExist(accountnum))
+            {
+                Console.Write("How much do u want to withdraw: ");
+                decimal amount = Convert.ToDecimal(Console.ReadLine());
+                Console.Write("Enter your pin: ");
+                string pin = Console.ReadLine();
+                while (customer.Pin != pin)
+                {
+                    Console.WriteLine("Invalid pin!!");
+                    pin = Console.ReadLine();
+                }
+                Totalamount += amount + transaction.Charges;
+                customer.AccountBalance -= Totalamount;
+                customerRepo.RefreshFile();
+                Console.WriteLine($"You have withdrawn {Totalamount} from your account and your balance is {customer.AccountBalance}");
+                string opt = string.Empty;
+                do
+                {
+                    Console.WriteLine("Do u wish to continue: (yes/no) ");
+                    opt = Console.ReadLine().ToLower();
+                } while (!(opt.Equals("yes")) && !opt.Equals("no"));
+                if (opt == "no")
+                {
+                    break;
+                }
+            }
+
         }
 
 

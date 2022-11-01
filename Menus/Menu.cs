@@ -26,9 +26,11 @@ namespace BankApp.Menus
                 switch (opt)
                 {
                     case "1":
+                        Console.WriteLine("Enter your Email: ");
+                        string email = Console.ReadLine();
                         Console.Write("Enter your password: ");
                         string password = Console.ReadLine();
-                        var customer = customerService.Login(password);
+                        var customer = customerService.Login(email,password);
                         if (customer == null)
                         {
                             Console.WriteLine("customer does not exist");
@@ -68,7 +70,9 @@ namespace BankApp.Menus
                     case "1":
                         customerService.MakeDeposit(customer);
                         break;
-
+                    case "2":
+                        customerService.MakeWithdrawal(customer);
+                        break;
                     case "0":
                         flag = false;
                         break;

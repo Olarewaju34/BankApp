@@ -1,7 +1,7 @@
 using BankApp.Enums;
 namespace BankApp.Entities
 {
-    public class Customer
+    public class Customer 
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

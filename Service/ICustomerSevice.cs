@@ -4,10 +4,10 @@ namespace BankApp.Service
 {
     public interface ICustomerService
     {
-        Customer Login(string password);
+        Customer Login(string email,string password);
         void Create(CustomerDto request);
         void MakeDeposit(Customer transaction);
-        void MakeWithdrawal(Transaction money);
+        void MakeWithdrawal(Customer customer);
         bool AccountNumExist(string accountnum);
     }
 }
