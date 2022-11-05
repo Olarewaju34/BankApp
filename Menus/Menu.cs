@@ -1,19 +1,20 @@
 using BankApp.Entities;
 using BankApp.Enums;
 using BankApp.Service;
+
 namespace BankApp.Menus
 {
     public class Menu
     {
         private static ICustomerService customerService;
-        private static Transaction transaction;
-        CustomerDto customerDto;
+        private static ITransactionService transactionService;
+        private static CustomerDto customerDto;
 
         public Menu()
         {
             customerDto = new CustomerDto();
             customerService = new CustomerService();
-            transaction = new Transaction();
+            transactionService = new TransactionService();
         }
         public void MyMenu()
         {
@@ -30,7 +31,7 @@ namespace BankApp.Menus
                         string email = Console.ReadLine();
                         Console.Write("Enter your password: ");
                         string password = Console.ReadLine();
-                        var customer = customerService.Login(email,password);
+                        var customer = customerService.Login(email);
                         if (customer == null)
                         {
                             Console.WriteLine("customer does not exist");
@@ -68,10 +69,10 @@ namespace BankApp.Menus
                 switch (opt)
                 {
                     case "1":
-                        customerService.MakeDeposit(customer);
+                        transactionService.MakeDeposit(customer);
                         break;
                     case "2":
-                        customerService.MakeWithdrawal(customer);
+                        transactionService.MakeWithdrawal(customer);
                         break;
                     case "0":
                         flag = false;

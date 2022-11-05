@@ -7,32 +7,16 @@ namespace BankApp.Service
 {
     public class CustomerService : ICustomerService
     {
-        public static TransactionRepo transactionRepos;
-        public static CustomerRepo customerRepo;
-        public static Transaction transaction;
+        private readonly CustomerRepo customerRepo;
+
         public CustomerService()
         {
-            transactionRepos = new TransactionRepo();
             customerRepo = new CustomerRepo();
-            transaction = new Transaction();
         }
-
-        public bool AccountNumExist(string accountnum)
+        public void  Create(CustomerDto request)
         {
             var customers = customerRepo.GetAll();
-            foreach (var customer in customers)
-            {
-                if (customer.AccountNum == accountnum)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void Create(CustomerDto request)
-        {
-            var customers = customerRepo.GetAll();
+            int id = (customers.Count != 0) ? customers[customers.Count - 1].Id + 1 : 1;
             Console.WriteLine("Enter Your Date Of Birth (MM/dd/yyyy) format: ");
             DateTime dob = DateTime.Parse(Console.ReadLine());
             Console.Write("Enter your FirstName: ");
@@ -41,7 +25,7 @@ namespace BankApp.Service
             request.LastName = Console.ReadLine();
             Console.Write("Enter your Phone number: ");
             request.Phone = Console.ReadLine();
-            int gender = Helper.SelectEnum("Enter 1 for male\n2 for female\n3 for others", 1, 3);
+            int gender = Helper.SelectEnum("Enter 1 for male\n2 for female\n3 for others: ", 1, 3);
             request.Gender = (Gender)gender;
             Console.Write("Enter your Email: ");
             request.Email = Console.ReadLine();
@@ -52,7 +36,7 @@ namespace BankApp.Service
             }
             Console.Write("Enter your password: ");
             string password = Console.ReadLine();
-            
+
             Console.Write("Enter your 4 unique pin: ");
             string pin = Console.ReadLine();
             while (pin.Length < 4 || pin.Length > 4)
@@ -71,6 +55,7 @@ namespace BankApp.Service
 
             var customer = new Customer
             {
+                Id = id,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Phone = request.Phone,
@@ -80,9 +65,9 @@ namespace BankApp.Service
                 Password = password,
                 Email = request.Email,
                 AccountBalance = amount,
-                Date = dob,
+                DateOfBirth = dob,
             };
-            var findcustomer = customerRepo.GetCustomer(request.Email,password);
+            var findcustomer = customerRepo.GetById(id);
             if (findcustomer == null)
             {
                 customers.Add(customer);
@@ -91,14 +76,14 @@ namespace BankApp.Service
             }
             else
             {
-                Console.WriteLine("Email already exist!!!!");
+                Console.WriteLine("Customer already exist!!!!");
             }
 
         }
 
-        public Customer Login(string email,string password)
+        public Customer Login(string email)
         {
-            var customer = customerRepo.GetCustomer(email,password);
+            var customer = customerRepo.GetByEmail(email);
             if (customer != null)
             {
                 return customer;
@@ -106,75 +91,6 @@ namespace BankApp.Service
             return null;
         }
 
-        public void MakeDeposit(Customer request)
-        {
-            var transactions = transactionRepos.GetTransactions();
-            Console.Write("Enter Amount you want to deposit: ");
-            decimal amount = Convert.ToDecimal(Console.ReadLine());
-            Console.WriteLine("Enter your accountnumber: ");
-            string accountnum = Console.ReadLine();
-            DateTime date = DateTime.Now;
-            var transaction = new Transaction
-            {
-                Amount = amount,
-                Date = date
-            };
-            if (AccountNumExist(accountnum))
-            {
-                Console.WriteLine("Enter your pin: ");
-                string pin = Console.ReadLine();
-                while (request.Pin != pin)
-                {
-                    Console.WriteLine("Invalid pin!!!");
-                    pin = Console.ReadLine();
-                }
-                request.AccountBalance += amount;
-                transactions.Add(transaction);
-                customerRepo.RefreshFile();
-                Console.WriteLine($"You have deposited {amount} in your account");
-
-            }
-            else
-            {
-                Console.WriteLine("Acount does not exist!!!");
-            }
-        }
-
-        public void MakeWithdrawal(Customer customer)
-        {
-            decimal Totalamount = 0;
-            Console.WriteLine("Enter your account number: ");
-            string accountnum = Console.ReadLine();
-
-            while (AccountNumExist(accountnum))
-            {
-                Console.Write("How much do u want to withdraw: ");
-                decimal amount = Convert.ToDecimal(Console.ReadLine());
-                Console.Write("Enter your pin: ");
-                string pin = Console.ReadLine();
-                while (customer.Pin != pin)
-                {
-                    Console.WriteLine("Invalid pin!!");
-                    pin = Console.ReadLine();
-                }
-                Totalamount += amount + transaction.Charges;
-                customer.AccountBalance -= Totalamount;
-                customerRepo.RefreshFile();
-                Console.WriteLine($"You have withdrawn {Totalamount} from your account and your balance is {customer.AccountBalance}");
-                string opt = string.Empty;
-                do
-                {
-                    Console.WriteLine("Do u wish to continue: (yes/no) ");
-                    opt = Console.ReadLine().ToLower();
-                } while (!(opt.Equals("yes")) && !opt.Equals("no"));
-                if (opt == "no")
-                {
-                    break;
-                }
-            }
-
-        }
-
-
+ 
     }
 }

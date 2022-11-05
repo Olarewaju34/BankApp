@@ -1,7 +1,7 @@
 using BankApp.Enums;
 namespace BankApp.Entities
 {
-    public class Customer 
+    public class Customer : baseEntities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -12,12 +12,10 @@ namespace BankApp.Entities
         public Gender Gender { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public DateTime Date { get; set; }
-
 
         public override string ToString()
         {
-            return $"{FirstName}\t{LastName}\t{Phone}\t{AccountBalance}\t{AccountNum}\t{Pin}\t{Gender}\t{Email}\t{Password}\t{Date}";
+            return $"{FirstName}\t{LastName}\t{Phone}\t{AccountBalance}\t{AccountNum}\t{Pin}\t{Gender}\t{Email}\t{Password}\t{DateOfBirth}";
         }
         public static Customer ToCustomer(string str)
         {
@@ -33,7 +31,7 @@ namespace BankApp.Entities
                 Gender = Enum.Parse<Gender>(type[6]),
                 Email = type[7],
                 Password =type[8],
-                Date = DateTime.Parse(type[9])
+                DateOfBirth = DateTime.Parse(type[9])
 
             };
             return  customer;

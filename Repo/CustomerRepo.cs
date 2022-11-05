@@ -1,6 +1,6 @@
 using BankApp.Entities;
 using BankApp.Constants;
-
+using BankApp.Repo;
 
 namespace BankApp.Repo
 {
@@ -14,9 +14,9 @@ namespace BankApp.Repo
             ReadFromFile();
         }
 
-        public Customer GetCustomer(string email, string password)
+        public Customer GetById(int id)
         {
-            return Customers.Find(i => i.Email == email && i.Password == password);
+            return Customers.Find(i => i.Id == id);
         }
 
         public List<Customer> GetAll()
@@ -89,6 +89,22 @@ namespace BankApp.Repo
             }
         }
 
+        public bool AccountNumExist(string accountnum)
+        {
+            var customers = GetAll();
+            foreach (var customer in customers)
+            {
+                if (customer.AccountNum == accountnum)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+        public Customer GetByEmail(string email)
+        {
+            return Customers.Find(i => i.Email == email);
+        }
     }
 }
